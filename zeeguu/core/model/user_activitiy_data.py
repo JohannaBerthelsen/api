@@ -373,9 +373,23 @@ class UserActivityData(db.Model):
         """
         Update the user's streak based on the current activity date.
         """
-    if user.last_activity_date:
+        if user.last_activity_date:
         #Check for inactivty for more than 1 day
-        days_inactive = (current_date - user.last_activity_date).days
-        if
+            days_inactive = (current_date - user.last_activity_date).days
+            if days_inactive > 1:
+                cls.reset_streak(user)
+                return
+        
+        if user.last_activity_date is None or current_date - user.last_activity_date == timedelta(days=1):
+            user.streak += 1
+        else: 
+            user.streak = 1
+
+        user.last_activity_date = current_date
+    
+    def reset_streak(cls, user):
+
+        user.streak = 0
+
 
 
