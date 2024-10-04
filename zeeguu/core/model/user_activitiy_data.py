@@ -366,3 +366,16 @@ class UserActivityData(db.Model):
 
         session.add(new_entry)
         session.commit()
+    
+    @classmethod
+    def update_streak(cls, user, current_date):
+
+        """
+        Update the user's streak based on the current activity date.
+        """
+    if user.last_activity_date:
+        #Check for inactivty for more than 1 day
+        days_inactive = (current_date - user.last_activity_date).days
+        if
+
+

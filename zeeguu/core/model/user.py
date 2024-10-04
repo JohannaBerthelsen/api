@@ -9,6 +9,7 @@ import zeeguu.core
 from sqlalchemy import Column, ForeignKey, Integer, Boolean, func
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy import DateTime
 
 from zeeguu.core.language.difficulty_estimator_factory import DifficultyEstimatorFactory
 from zeeguu.core.model.language import Language
@@ -43,6 +44,8 @@ class User(db.Model):
     email = db.Column(db.String(255), unique=True)
     name = db.Column(db.String(255))
     invitation_code = db.Column(db.String(255))
+    streak = db.Column(Integer, default = 0)
+    last_activity_date = db.Column(DateTime)
     password = db.Column(db.String(255))
     password_salt = db.Column(db.String(255))
     learned_language_id = db.Column(db.Integer, db.ForeignKey(Language.id))
