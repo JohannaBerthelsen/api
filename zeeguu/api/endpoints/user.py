@@ -216,3 +216,62 @@ def leave_cohort(cohort_id):
     except Exception as e:
         print(e)
         return "FAIL"
+    
+@api.route("/get_streak", methods=["GET"])
+@cross_domain
+@requires_session
+def get_streak():
+    """
+    Retrieve the current streak for the user in session
+    """
+    user = User.find_by_idd(flask.g.user_id)
+
+    if not user:
+        return flask.jsonify({"error": "User not found"}), 404
+    
+    streak_data ={
+        "streak": user.streak,
+        "last_activity_date": user.last_activity_date
+    }
+    return json_result(streak_data)
+
+@api.route("/update_streak", methods=["POST"])
+@cross_domain
+@requires_session
+def update_streak():
+    """
+    Update the streak for the user in session based on activity
+    """
+
+    from datetime import datetime
+    user = User.find_by_id(flask.g.user_id)
+
+    if not user: 
+        return flask.jsonify({"error": "User not found"}), 404
+    
+    current_date = datetime.now().date()
+    UserActivityData.update_streak(zeeguu.core.model.db.session, user, current_date)
+    zeeguu.core.model.db.session.commit()
+
+    return json_result({"message": "Streak updated", "streak": user.streak})
+
+
+@api.route("/reset_streak", methods=["POST"])
+@cross_domain
+@requires_session
+
+def reset_streak():
+    """
+    Reset the streak for the user in session
+    """
+    user = User.find_by_id(flask.g.user_id)
+
+    if not user:
+        return flask.jsonify({"error": "User not found"}), 404
+    
+    UserActivityData.reset_streak(zeeguu.core.model.db.session, user)
+    
+    zeeguu.core.model.db.session.commit()
+
+    return json_result({"message": "Streak reset", "streak": user.streak})
+

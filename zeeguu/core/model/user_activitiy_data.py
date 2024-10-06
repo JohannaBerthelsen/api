@@ -39,6 +39,9 @@ class UserActivityData(db.Model):
     value = Column(String(255))
     extra_data = Column(String(4096))
 
+    streak = Column(Integer, default=0)
+    last_activity_date = Column(DateTime)
+
     # article_id is a FK
     # for those user_activity_data that are not about article
     # interactions, the FK is NULL
@@ -368,7 +371,7 @@ class UserActivityData(db.Model):
         session.commit()
     
     @classmethod
-    def update_streak(cls, user, current_date):
+    def update_streak(cls, session, user, current_date):
 
         """
         Update the user's streak based on the current activity date.
@@ -377,7 +380,7 @@ class UserActivityData(db.Model):
         #Check for inactivty for more than 1 day
             days_inactive = (current_date - user.last_activity_date).days
             if days_inactive > 1:
-                cls.reset_streak(user)
+                cls.reset_streak(session, user)
                 return
         
         if user.last_activity_date is None or current_date - user.last_activity_date == timedelta(days=1):
@@ -386,10 +389,14 @@ class UserActivityData(db.Model):
             user.streak = 1
 
         user.last_activity_date = current_date
+
+        session.commit()
     
-    def reset_streak(cls, user):
+    @classmethod
+    def reset_streak(cls, session, user):
 
         user.streak = 0
+        session.commit()
 
 
 
